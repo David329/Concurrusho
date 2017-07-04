@@ -7,16 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-/**
- * @author Burak Sahin
- * Java Network Programming | Pong Game
-*/  
-
 public class Test extends JFrame implements KeyListener, Runnable{
-	
-	/**
-	 * Test of the game [*Main Class]
-	 */
 	
 	private static final long serialVersionUID = 1L;
 	  
@@ -51,7 +42,7 @@ public class Test extends JFrame implements KeyListener, Runnable{
 	
 	public static void main(String[] args){
 		Toolkit tk = Toolkit.getDefaultToolkit();
-		image = tk.getImage("..\\Resources\\bg.png"); // - Set background texture of main menu - //
+		image = tk.getImage("..\\Resources\\Servidor.png"); // - Set background texture of main menu - //
 		Test newT = new Test();
 		newT.run();
 
@@ -124,50 +115,6 @@ public class Test extends JFrame implements KeyListener, Runnable{
 				}
 			}
 		}
-			
-		
-		
-		// - Create a Client - //
-		if(keyCode==KeyEvent.VK_C){
-			
-			// - Input Dialog [IP Address] - // 
-			ipAdd = JOptionPane.showInputDialog(null, "Ejemplo: 127.0.0.1", "Ingrese IP del servidor:", 1);
-			
-			if(ipAdd!=null){
-				
-				// - Alert Message - //
-				if(!isIPAddress(ipAdd)){
-					JOptionPane.showMessageDialog(null, "¡La dirección IP ingresada no es válida!", "Error!", JOptionPane.ERROR_MESSAGE);
-				}
-				
-				else{
-					// - Input Dialog [Port Number] - // 
-					portAdd = JOptionPane.showInputDialog(null, "Ejemplo: 6666", "Ingrese el puerto del servidor:", 1);
-					
-					// - Alert Message - //
-					if(portAdd!=null){
-						if(!isPort(portAdd)){
-							JOptionPane.showMessageDialog(null, "¡El formato del puerto no es válido!", "Error!:", JOptionPane.ERROR_MESSAGE);
-						}
-						// - Input Dialog for get a nick name for client player - //
-						else{
-							clientname = JOptionPane.showInputDialog(null, "Nombre de jugador:", "Ingrese su nombre:", 1);
-							clientname += "";
-							if(clientname.length()>10 || clientname.length()<3 || clientname.startsWith("null")){
-								JOptionPane.showMessageDialog(null, "¡El nombre ingresado no tiene un fomato válido!", "Error!", JOptionPane.ERROR_MESSAGE);
-							}
-							// - Start a Client - //
-							else{
-								PongClient myClient = new PongClient(clientname, portAdd, ipAdd);
-								Thread myClientT = new Thread(myClient);
-								myClientT.start();
-								this.setVisible(false);
-							}	
-						}
-					}
-				}
-			}
-		}//<--end_of_the_key_cond.-->//
 }//<--end_of_the_switch-->//
 
 	@Override

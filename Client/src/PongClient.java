@@ -165,7 +165,7 @@ public class PongClient extends JFrame implements KeyListener, Runnable, WindowL
 	    
 	    
 	    // - Player's Bar - //
-	    g.setColor(new Color(57,181,74));
+	    g.setColor(new Color(73,235,224));
 	    g.fillRect(playerS.getX(), playerS.getY(), barR, playerH);
 	    g.setColor(new Color(57,181,74));
 	    g.fillRect(playerC.getX(), playerC.getY(), barR, playerH);

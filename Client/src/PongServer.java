@@ -220,7 +220,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
 	    // - Ball - //
 	    g.setColor(new Color(255,255,255));
 	    g.fillOval(playerS.getBallx(), playerS.getBally(), 45, 45);
-	    g.setColor(new Color(228,38,36));
+	    g.setColor(movingBALL.getColorBall());
 	    g.fillOval(playerS.getBallx()+5, playerS.getBally()+5, 45-10, 45-10);
 	    
 	    // - Message - //
