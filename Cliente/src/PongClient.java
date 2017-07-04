@@ -27,7 +27,7 @@ public class PongClient extends JFrame implements KeyListener, Runnable, WindowL
 	///////////////////
 	
 	// - Frame - //
-	private static final String TITLE  = "ping-pong::client";	
+	private static final String TITLE  = "ping-pong::cliente";	
 	private static final int    WIDTH  = 800;		  // - Width  size for window - //
 	private static final int    HEIGHT = 460;		  // - Height size for window - //
 	boolean isRunning = false;
@@ -88,9 +88,9 @@ public class PongClient extends JFrame implements KeyListener, Runnable, WindowL
 		// Server Socket //
    	 try {
  
-        	 System.out.println("Finding server...\nConnecting to "+ipAdd+":"+portAdd);
+        	 System.out.println("Buscando servidor...\nConectándose a "+ipAdd+":"+portAdd);
         	 clientSoc = new Socket(ipAdd, portAdd);
-    		 System.out.println("Connected to server...");
+    		 System.out.println("Conectado al servidor...");
             
         	 if(clientSoc.isConnected()){
             	System.out.println("TEST");
@@ -123,7 +123,7 @@ public class PongClient extends JFrame implements KeyListener, Runnable, WindowL
         		 
         	 }
         	 else{
-        		 System.out.println("Disconnected...");
+        		 System.out.println("Desconectado...");
         	 }
             
  

@@ -28,7 +28,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
 	///////////////////
 	
 	// - Frame - //
-	private static final String TITLE  = "ping-pong::server";	
+	private static final String TITLE  = "ping-pong::servidor";	
 	private static final int    WIDTH  = 800;		  // - Width  size for window - //
 	private static final int    HEIGHT = 460;		  // - Height size for window - //
 	
@@ -75,7 +75,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
 		// - Setting Frame - //
 		this.portAdd = Integer.parseInt(portAdd);
 		this.isRunning = true;
-		this.setTitle(TITLE + "::port number["+portAdd+"]");
+		this.setTitle(TITLE + "::puerto["+portAdd+"]");
 		this.setSize(WIDTH,HEIGHT);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(true);
@@ -100,31 +100,33 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
 		// Server Socket //
    	 try {
    		 	serverSoc = new ServerSocket(portAdd);
-        	 System.out.println("Server has started to running on the "+portAdd+" port.\nWaiting for a player...");
-        	 System.out.println("Waiting for connection...");
-        	 playerS.setImessage("Waiting f   r a player...");
+        	 System.out.println("El servidor ha empezado a correr en el puerto " +portAdd+ ".\nEsperando otro jugador...");
+        	 System.out.println("Esperando conexión...");
+        	 playerS.setImessage("Esperando otro jugador");
         	 clientSoc = serverSoc.accept();
    			 
-        	 System.out.println("Connected a player...");
+        	 System.out.println("Conectado a un jugador...");
         	
         	 if(clientSoc.isConnected()){ // - If connected a player start to loop - //
         		 
         		boolean notchecked = true; // - Client isChecked? - //
         		 movB = new Thread(movingBALL);
         		 while(true){
-        			  
+        			 if (Restart == true) Restart = false; 
         			 // - Checking game situation - //
         			 if(playerS.getScoreP() >= max_Score || playerS.getScoreS()>= max_Score && Restart==false){
         				 
         				 if(playerS.getScoreS()>playerS.getScoreP()){        				 
-        					 playerS.setOmessage("Won               Loss-Play Again: Press any key || Exit: Esc|N");
-        					 playerS.setImessage("Won               Loss-Play again? ");
+        					 playerS.setOmessage("Ganador   Perdedor-Jugar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+        					 playerS.setImessage("Ganador   Perdedor-¿Jugar de nuevo?");
         					 Restart = true;
+                                                 
         				 }
         				 else{
-        					 playerS.setImessage("Loss              Won-Play Again: Press any key || Exit: Esc|N");
-        					 playerS.setOmessage("Loss              Won-Play Again: Press any key || Exit: Esc|N");
+        					 playerS.setImessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+        					 playerS.setOmessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
         					 Restart = true;
+                                                 
         					 }
                       	movB.suspend();	// - Stop the ball object - //
                     }
@@ -173,7 +175,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
                  	}
         	}
         	 else{
-        		 System.out.println("Disconnected...");
+        		 System.out.println("Desconectado...");
         	 }
         }
         catch (Exception e) {System.out.println(e);}
