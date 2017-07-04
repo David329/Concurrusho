@@ -1,3 +1,4 @@
+
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -7,7 +8,18 @@ import java.awt.image.BufferedImage;
 import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-public class Test extends JFrame implements KeyListener, Runnable{
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author David
+ */
+public class Main extends JFrame implements KeyListener, Runnable{
 	
 	private static final long serialVersionUID = 1L;
 	  
@@ -26,7 +38,7 @@ public class Test extends JFrame implements KeyListener, Runnable{
 	 // - Constructor - //
 	/////////////////////
 	
-	public Test(){
+	public Main(){
 
 	}
 	
@@ -43,7 +55,7 @@ public class Test extends JFrame implements KeyListener, Runnable{
 	public static void main(String[] args){
 		Toolkit tk = Toolkit.getDefaultToolkit();
 		image = tk.getImage("..\\Resources\\Servidor.png"); // - Set background texture of main menu - //
-		Test newT = new Test();
+		Main newT = new Main();
 		newT.run();
 
 	}

@@ -9,11 +9,17 @@ import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-/**
- * @author Burak Sahin Java Network Programming | Pong Game
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-public class Test extends JFrame implements KeyListener, Runnable {
+/**
+ *
+ * @author David
+ */
+public class Main extends JFrame implements KeyListener, Runnable {
 
     /**
      * Test of the game [*Main Class]
@@ -33,7 +39,7 @@ public class Test extends JFrame implements KeyListener, Runnable {
     /////////////////////
     // - Constructor - //
     /////////////////////
-    public Test() {
+    public Main() {
 
     }
 
@@ -50,7 +56,7 @@ public class Test extends JFrame implements KeyListener, Runnable {
     public static void main(String[] args) {
         Toolkit tk = Toolkit.getDefaultToolkit();
         image = tk.getImage("..\\Resources\\Cliente.png"); // - Set background texture of main menu - //
-        Test newT = new Test();
+        Main newT = new Main();
         newT.run();
 
     }
