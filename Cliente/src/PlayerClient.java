@@ -1,40 +1,27 @@
-import java.io.Serializable;
 
+import java.io.Serializable;
 
 public class PlayerClient implements Serializable {
 
-	/**
-	 * - Player Properties -
-	 */
-	
     private static final long serialVersionUID = 1L;
 
-	
-	  //////////////////////////
-	 // - Client Variables - //
-	//////////////////////////
-	
-	private String name ="";
-	private int	x, y;
+    private String name = "";
+    private int x, y;
     boolean ok = false;
-    	boolean restart = false;
+    boolean restart = false;
 
-	public PlayerClient(String name){
-		this.name = name;
+    public PlayerClient(String name) {
+        this.name = name;
         x = 740;
         y = 210;
     }
 
-	  ///////////////////////////
-	 // - Getters & Setters - //
-	///////////////////////////
-	
-	public String getName() {
-		return name;
+    public String getName() {
+        return name;
     }
 
-	public void setName(String name) {
-		this.name = name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getX() {
@@ -55,6 +42,6 @@ public class PlayerClient implements Serializable {
 
     @Override
     public String toString() {
-		return "PlayerClient [name=" + name + ", x=" + x + ", y=" + y + "]";
+        return "PlayerClient [name=" + name + ", x=" + x + ", y=" + y + "]";
     }
 }

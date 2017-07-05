@@ -38,7 +38,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
     private int playerBarWidth = 30;
     private int playerBarHeight = 120;
     private int puntajeMaximo = 9;
-    private int playerVelocidad = 8;
+    private int playerVelocidad = 10;
     private boolean reiniciar = false;
     private boolean reiniciarON = false;
 
@@ -183,7 +183,7 @@ public class PongServer extends JFrame implements KeyListener, Runnable, WindowL
         gr.drawString(playerServer.getName(), WIDTH / 10, HEIGHT - 20);
         gr.drawString(playerClient.getName(), 600, HEIGHT - 20);
 
-        //Jugadores
+        //Barra jugadores
         gr.setColor(new Color(73, 235, 224));
         gr.fillRect(playerServer.getX(), playerServer.getY(), playerBarWidth, playerBarHeight);
         gr.setColor(new Color(57, 181, 74));
