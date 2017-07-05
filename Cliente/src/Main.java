@@ -14,38 +14,27 @@ import javax.swing.JOptionPane;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author David
  */
 public class Main extends JFrame implements KeyListener, Runnable {
 
-    /**
-     * Test of the game [*Main Class]
-     */
     private static final long serialVersionUID = 1L;
 
-    ///////////////////
-    // - Variables - //
-    ///////////////////
-    private static Image image;
-    private Graphics g;
+    private static Image imagen;
+    private Graphics gr;
     private static final String TITLE = "ConcurrenteTF - Ping-Pong";
-    private static final int WIDTH = 800;		  // - Width  size for window - //
-    private static final int HEIGHT = 460;		  // - Height size for window - //
-    private String servername = "servername", clientname = "clientname";
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 460;
+    private String nombreCliente = "nombreCliente";
 
-    /////////////////////
-    // - Constructor - //
-    /////////////////////
     public Main() {
 
     }
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
         this.setVisible(true);
         this.setTitle(TITLE);
         this.setSize(WIDTH, HEIGHT);
@@ -55,23 +44,17 @@ public class Main extends JFrame implements KeyListener, Runnable {
 
     public static void main(String[] args) {
         Toolkit tk = Toolkit.getDefaultToolkit();
-        image = tk.getImage("..\\Resources\\Cliente.png"); // - Set background texture of main menu - //
+        imagen = tk.getImage("..\\Resources\\Cliente.png"); // - Set background texture of main menu - //
         Main newT = new Main();
         newT.run();
-
     }
 
-    ///////////////
-    // - Paint - //
-    ///////////////
     private Image createImage() {
-
         BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-        g = bufferedImage.createGraphics();
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.drawImage(image, 0, 0, this);
+        gr = bufferedImage.createGraphics();
+        gr.fillRect(0, 0, WIDTH, HEIGHT);
+        gr.drawImage(imagen, 0, 0, this);
         return bufferedImage;
-
     }
 
     @Override
@@ -79,74 +62,59 @@ public class Main extends JFrame implements KeyListener, Runnable {
         g.drawImage(createImage(), 0, 20, this);
     }
 
-    /////////////////////
-    // - KeyListener - //
-    /////////////////////
     @Override
     public void keyPressed(KeyEvent arg0) {
-        // TODO Auto-generated method stub
 
         int keyCode = arg0.getKeyCode();
-        String portAdd = null;
-        String ipAdd = null;
+        String puerto = null;
+        String direccionIP = null;
 
-        // - Create a Client - //
         if (keyCode == KeyEvent.VK_C) {
 
-            ipAdd = "127.0.0.1";
-            // - Alert Message - //
-            if (!isIPAddress(ipAdd)) {
+            direccionIP = "127.0.0.1";
+
+            if (!validarDireccionIP(direccionIP)) {
                 JOptionPane.showMessageDialog(null, "¡La dirección IP ingresada no es válida!", "Error!", JOptionPane.ERROR_MESSAGE);
             } else {
-                // - Input Dialog [Port Number] - // 
-                portAdd = JOptionPane.showInputDialog(null, "Ejemplo: 6666", "Ingrese el puerto del servidor:", 1);
 
-                // - Alert Message - //
-                if (portAdd != null) {
-                    if (!isPort(portAdd)) {
+                puerto = JOptionPane.showInputDialog(null, "Ejemplo: 6666", "Ingrese el puerto del servidor:", 1);
+
+                if (puerto != null) {
+                    if (!validarPuerto(puerto)) {
                         JOptionPane.showMessageDialog(null, "¡El formato del puerto no es válido!", "Error!:", JOptionPane.ERROR_MESSAGE);
-                    } // - Input Dialog for get a nick name for client player - //
-                    else {
-                        clientname = JOptionPane.showInputDialog(null, "Nombre de jugador:", "Ingrese su nombre:", 1);
-                        clientname += "";
-                        if (clientname.length() > 10 || clientname.length() < 3 || clientname.startsWith("null")) {
+                    } else {
+                        nombreCliente = JOptionPane.showInputDialog(null, "Nombre de jugador:", "Ingrese su nombre:", 1);
+                        nombreCliente += "";
+                        if (nombreCliente.length() > 10 || nombreCliente.length() < 3 || nombreCliente.startsWith("null")) {
                             JOptionPane.showMessageDialog(null, "¡El nombre ingresado no tiene un fomato válido!", "Error!", JOptionPane.ERROR_MESSAGE);
-                        } // - Start a Client - //
-                        else {
-                            PongClient myClient = new PongClient(clientname, portAdd, ipAdd);
-                            Thread myClientT = new Thread(myClient);
-                            myClientT.start();
+                        } else {
+                            PongClient pongClient = new PongClient(nombreCliente, puerto, direccionIP);
+                            Thread clientThread = new Thread(pongClient);
+                            clientThread.start();
                             this.setVisible(false);
                         }
                     }
                 }
             }
-        }//<--end_of_the_key_cond.-->//
-    }//<--end_of_the_switch-->//
+        }
+    }
 
     @Override
     public void keyReleased(KeyEvent arg0) {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void keyTyped(KeyEvent arg0) {
-        // TODO Auto-generated method stub
 
     }
 
-    //////////////////////
-    // - Check Inputs - //
-    //////////////////////
-    // - Check PORT number type- //
-    private boolean isPort(String str) {
+    private boolean validarPuerto(String str) {
         Pattern pPattern = Pattern.compile("\\d{1,4}");
         return pPattern.matcher(str).matches();
     }
-    // - Check IP address type- //
 
-    private boolean isIPAddress(String str) {
+    private boolean validarDireccionIP(String str) {
         Pattern ipPattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
         return ipPattern.matcher(str).matches();
     }

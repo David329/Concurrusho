@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 public class PlayerServer implements Serializable{
-	
+
 	/**
 	 * Server Player Properties
 	 */

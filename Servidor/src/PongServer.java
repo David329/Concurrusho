@@ -1,3 +1,4 @@
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -14,431 +15,343 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import javax.swing.JFrame;
 
+public class PongServer extends JFrame implements KeyListener, Runnable, WindowListener {
 
-public class PongServer extends JFrame implements KeyListener, Runnable, WindowListener{
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Pong_Server 
-	 */
-	
-	private static final long serialVersionUID = 1L;
-	  
-	  ///////////////////
- 	 // - Variables - //
-	///////////////////
-	
-	// - Frame - //
-	private static final String TITLE  = "ping-pong::servidor";	
-	private static final int    WIDTH  = 800;		  // - Width  size for window - //
-	private static final int    HEIGHT = 460;		  // - Height size for window - //
-	
-	// - Game Variables - //
-	boolean isRunning = false;
-	boolean check = true;
-	boolean initgame = false;
-	
-	// - Players & Objects - //
-	Ball movingBALL;
-	private PlayerServer playerS;
-	private PlayerClient playerC;
-	
-	private int ballVEL   = 4;		// - Ball Velocity - //
-	private int barR      = 30;		// - Player bar width - //
-	private int playerH   = 120; 	// - Player bar height - //
-	private int max_Score = 9; 		// - Maximum match score - //
-	private int mPLAYER   = 8; 		// - Moving of the player bar - //
-	private boolean Restart   = false;  // - Check Restart - //
-	private boolean restartON = false;
-	
-	// - Server - //
-	private static Socket                clientSoc  = null;
-	private static ServerSocket          serverSoc  = null;
-	private int portAdd;
-	
-	// - Graphical - //
-	private Graphics g;
-	private Font sFont = new Font("TimesRoman",Font.BOLD,90);
-	private Font mFont = new Font("TimesRoman",Font.BOLD,50);
-	private Font nFont = new Font("TimesRoman",Font.BOLD,32);
-	private Font rFont = new Font("TimesRoman",Font.BOLD,18);
-    	private String[] message;	// - Split Message to two piece in an array - //
-    	private Thread movB;
-    
-    // - Constructor - //
-	public PongServer(String servername, String portAdd){
-			
-		// - Create player classes - //
-		playerS = new PlayerServer();
-		playerC = new PlayerClient("");
-		playerS.setName(servername);
-				
-		// - Setting Frame - //
-		this.portAdd = Integer.parseInt(portAdd);
-		this.isRunning = true;
-		this.setTitle(TITLE + "::puerto["+portAdd+"]");
-		this.setSize(WIDTH,HEIGHT);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setVisible(true);
-		this.setResizable(false);
-			
-		// - Create Ball For Moving - //
-		movingBALL = new Ball(playerS.getBallx(),playerS.getBally(),ballVEL,ballVEL,45,WIDTH,HEIGHT);
-			
-		// - Listener - //
-		addKeyListener(this);
-		//addWindowListener(this);
-	   }	
-		
-	  /////////////
-	 // - Run - //
-	/////////////
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		// Server Socket //
-   	 try {
-   		 	serverSoc = new ServerSocket(portAdd);
-        	 System.out.println("El servidor ha empezado a correr en el puerto " +portAdd+ ".\nEsperando otro jugador...");
-        	 System.out.println("Esperando conexión...");
-        	 playerS.setImessage("Esperando otro jugador");
-        	 clientSoc = serverSoc.accept();
-   			 
-        	 System.out.println("Conectado a un jugador...");
-        	
-        	 if(clientSoc.isConnected()){ // - If connected a player start to loop - //
-        		 
-        		boolean notchecked = true; // - Client isChecked? - //
-        		 movB = new Thread(movingBALL);
-        		 while(true){
-        			 if (Restart == true) Restart = false; 
-        			 // - Checking game situation - //
-        			 if(playerS.getScoreP() >= max_Score || playerS.getScoreS()>= max_Score && Restart==false){
-        				 
-        				 if(playerS.getScoreS()>playerS.getScoreP()){        				 
-        					 playerS.setOmessage("Ganador   Perdedor-Jugar de nuevo: Presione cualquier tecla || Salir: Esc|N");
-        					 playerS.setImessage("Ganador   Perdedor-¿Jugar de nuevo?");
-        					 Restart = true;
-                                                 
-        				 }
-        				 else{
-        					 playerS.setImessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
-        					 playerS.setOmessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
-        					 Restart = true;
-                                                 
-        					 }
-                      	movB.suspend();	// - Stop the ball object - //
+    //Variables ventana
+    private static final String TITLE = "ping-pong::servidor";
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 460;
+
+    //Variables del juego
+    boolean enEjecucion = false;
+    boolean verificar = true;
+    boolean initgame = false;
+
+    //Variables de jugador y objetos
+    Ball ball;
+    private PlayerServer playerServer;
+    private PlayerClient playerClient;
+
+    private int ballVelocidad = 4;
+    private int playerBarWidth = 30;
+    private int playerBarHeight = 120;
+    private int puntajeMaximo = 9;
+    private int playerVelocidad = 8;
+    private boolean reiniciar = false;
+    private boolean reiniciarON = false;
+
+    //Servidor
+    private static Socket clientSocket = null;
+    private static ServerSocket serverSocket = null;
+    private int puerto;
+
+    //Gráficos
+    private Graphics gr;
+    private Font sFont = new Font("TimesRoman", Font.BOLD, 90);
+    private Font mFont = new Font("TimesRoman", Font.BOLD, 50);
+    private Font nFont = new Font("TimesRoman", Font.BOLD, 32);
+    private Font rFont = new Font("TimesRoman", Font.BOLD, 18);
+    private String[] message;
+    private Thread ballThread;
+
+    public PongServer(String servername, String portAdd) {
+
+        playerServer = new PlayerServer();
+        playerClient = new PlayerClient("");
+        playerServer.setName(servername);
+
+        this.puerto = Integer.parseInt(portAdd);
+        this.enEjecucion = true;
+        this.setTitle(TITLE + "::puerto[" + portAdd + "]");
+        this.setSize(WIDTH, HEIGHT);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+        this.setResizable(false);
+
+        ball = new Ball(playerServer.getBallx(), playerServer.getBally(), ballVelocidad, ballVelocidad, 45, WIDTH, HEIGHT);
+
+        addKeyListener(this);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void run() {
+
+        try {
+            serverSocket = new ServerSocket(puerto);
+            System.out.println("El servidor ha empezado a correr en el puerto " + puerto + ".\nEsperando otro jugador...");
+            System.out.println("Esperando conexión...");
+            playerServer.setImessage("Esperando otro jugador");
+            clientSocket = serverSocket.accept();
+
+            System.out.println("Conectado a un jugador...");
+
+            if (clientSocket.isConnected()) {
+
+                boolean noVerificado = true;
+                ballThread = new Thread(ball);
+                while (true) {
+                    if (reiniciar == true) {
+                        reiniciar = false;
                     }
-        			 
-        			
-        			 // - Check -> is client ready... //
-            		 if(playerC.ok && notchecked){
-            			 playerS.setImessage("");
-                  	    movB.start();
-                  	    notchecked = false;
-                 	}
-        			 
-            		 // - Update Ball - //
-            		 updateBall();
-        			
-            		 // - Creating Streams - //
-        			ObjectInputStream getObj = new ObjectInputStream(clientSoc.getInputStream());
-					playerC = (PlayerClient) getObj.readObject();
-					getObj = null;
-					
-					// - Send Object to Client - //
-					ObjectOutputStream sendObj = new ObjectOutputStream(clientSoc.getOutputStream());
-                 	sendObj.writeObject(playerS);
-                 	sendObj = null;
-                 
-                 	// - Check Restart Game - //
-                 	if(restartON){
-                 	
-                 		if(playerC.restart){
-            			playerS.setScoreP(0);
-            			playerS.setScoreS(0);
-            			playerS.setOmessage("");
-            			playerS.setImessage("");
-            			Restart = false;
-                 		playerS.setRestart(false);
-                 		playerS.setBallx(380);
-                 		playerS.setBally(230);
-                 		movingBALL.setX(380);
-                 		movingBALL.setY(230);
-                 		movB.resume();
-                 		restartON = false;
-                 		}
-                 	}
-                 	// - Repaint - //
-                 	repaint();
-                 	}
-        	}
-        	 else{
-        		 System.out.println("Desconectado...");
-        	 }
+
+                    if (playerServer.getScoreP() >= puntajeMaximo || playerServer.getScoreS() >= puntajeMaximo && reiniciar == false) {
+
+                        if (playerServer.getScoreS() > playerServer.getScoreP()) {
+                            playerServer.setOmessage("Ganador   Perdedor-Jugar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+                            playerServer.setImessage("Ganador   Perdedor-Jugar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+                            reiniciar = true;
+
+                        } else {
+                            playerServer.setImessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+                            playerServer.setOmessage("Perdedor  Ganador-Juegar de nuevo: Presione cualquier tecla || Salir: Esc|N");
+                            reiniciar = true;
+
+                        }
+                        ballThread.suspend();
+                    }
+
+                    if (playerClient.ok && noVerificado) {
+                        playerServer.setImessage("");
+                        ballThread.start();
+                        noVerificado = false;
+                    }
+
+                    updateBall();
+
+                    ObjectInputStream getObj = new ObjectInputStream(clientSocket.getInputStream());
+                    playerClient = (PlayerClient) getObj.readObject();
+                    getObj = null;
+
+                    ObjectOutputStream sendObj = new ObjectOutputStream(clientSocket.getOutputStream());
+                    sendObj.writeObject(playerServer);
+                    sendObj = null;
+
+                    if (reiniciarON) {
+
+                        if (playerClient.restart) {
+                            playerServer.setScoreP(0);
+                            playerServer.setScoreS(0);
+                            playerServer.setOmessage("");
+                            playerServer.setImessage("");
+                            reiniciar = false;
+                            playerServer.setRestart(false);
+                            playerServer.setBallx(380);
+                            playerServer.setBally(230);
+                            ball.setX(380);
+                            ball.setY(230);
+                            ballThread.resume();
+                            reiniciarON = false;
+                        }
+                    }
+
+                    repaint();
+                }
+            } else {
+                System.out.println("Desconectado...");
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        catch (Exception e) {System.out.println(e);}
-}
- 
+    }
 
-	  ///////////////
-	 // - Paint - //
-	///////////////
-	
-	private Image createImage(){
-		
-		// - BufferedImage Keep the Screen Frames - //
-	    BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
-	    g = bufferedImage.createGraphics();
-	    
-	    // - Table - //
-	    g.setColor(new Color(15,9,9));
-	    g.fillRect(0, 0, WIDTH, HEIGHT);
-	    
-	    // - Lines - //
-	    g.setColor(Color.white);
-	    g.fillRect(WIDTH/2-5, 0, 5, HEIGHT);
-	    g.fillRect(WIDTH/2+5, 0, 5, HEIGHT);
-	    
-	    // - Score - //
-	    g.setFont(sFont);
-	    g.setColor(new Color(228,38,36));
-	    g.drawString(""+playerS.getScoreS(), WIDTH/2-60, 120);
-	    g.drawString(""+playerS.getScoreP(), WIDTH/2+15, 120);
-	    
-	    // - Player Names - //
-	    g.setFont(nFont);
-	    g.setColor(Color.white);
-	    g.drawString(playerS.getName(),WIDTH/10,HEIGHT-20);
-	    g.drawString(playerC.getName(),600,HEIGHT-20);
-	    
-	    // - Players - //
-	    g.setColor(new Color(73,235,224));
-	    g.fillRect(playerS.getX(), playerS.getY(), barR, playerH);
-	    g.setColor(new Color(57,181,74));
-	    g.fillRect(playerC.getX(), playerC.getY(), barR, playerH);
-	    
-	    // - Ball - //
-	    g.setColor(new Color(255,255,255));
-	    g.fillOval(playerS.getBallx(), playerS.getBally(), 45, 45);
-	    g.setColor(movingBALL.getColorBall());
-	    g.fillOval(playerS.getBallx()+5, playerS.getBally()+5, 45-10, 45-10);
-	    
-	    // - Message - //
-	    message = playerS.getImessage().split("-");
-	    g.setFont(mFont);
-	    g.setColor(Color.white);
-	    if(message.length!=0){
-	    g.drawString(message[0],WIDTH/4-31,HEIGHT/2+38);
-	    if(message.length>1){
-	    	if(message[1].length()>6){
-	    	    	g.setFont(rFont);
-	    			g.setColor(new Color(228,38,36));
-	    			g.drawString(message[1],WIDTH/4-31,HEIGHT/2+100);
-	    	}
-	    }
-	   }
-	   return bufferedImage;
-	}
-	
-	@Override
-	public void paint(Graphics g){
-		g.drawImage(createImage(), 0, 0, this);
-	}
-	
-	  /////////////////////
-	 // - Update Ball - //
-	/////////////////////
-	
-	public void updateBall(){
-		
-		// - Checking collisions - //
-		checkCol();
-		
-		// - update the ball - //
-		playerS.setBallx(movingBALL.getX());
-		playerS.setBally(movingBALL.getY());
-		
-	}
-	
-	  ///////////////////////
-	 // - Update Player - //
-	///////////////////////
-	
-	// - Move bar to Up - //
-	public void playerUP(){
-		if(playerS.getY() - mPLAYER > playerH/2-10){
-			
-			playerS.setY(playerS.getY()-mPLAYER);
-		}
-	}
-	
-	// - Move bar to Down - //
-	public void playerDOWN(){
-		if(playerS.getY() + mPLAYER < HEIGHT - playerH - 30){
-			
-			playerS.setY(playerS.getY()+mPLAYER);
-		}
-	}
-	
-	  /////////////////////////
-	 // - Check Collision - //
-	/////////////////////////
-	
-	public void checkCol(){
-		
-		
-		// - Checking ball side, when a player got a score check -> false * if ball behind of the players check -> true
-		if(playerS.getBallx() < playerC.getX() && playerS.getBallx() > playerS.getX()){
-			check = true;
-		}
-		
-		// - Server Player Score - //
-		if(playerS.getBallx()>playerC.getX() && check){
-			
-			playerS.setScoreS(playerS.getScoreS()+1);
-			
-			check = false;
-		}
-		
-		// - Client Player Score - //
-		else if (playerS.getBallx()<=playerS.getX() && check){
-			
-			playerS.setScoreP(playerS.getScoreP()+1);
-			
-			check = false;
-			
-		}
-		
-		
-		// - Checking Server Player Bar - //
-		if(movingBALL.getX()<=playerS.getX()+barR && movingBALL.getY()+movingBALL.getRadius()>= playerS.getY() && movingBALL.getY()<=playerS.getY()+playerH ){
-			movingBALL.setX(playerS.getX()+barR);
-			playerS.setBallx(playerS.getX()+barR);
-			movingBALL.setXv(movingBALL.getXv()*-1);
-		}
-		
-		
-		// - Checking Client Player Bar - //
-		if(movingBALL.getX()+movingBALL.getRadius()>=playerC.getX() && movingBALL.getY() + movingBALL.getRadius() >= playerC.getY() && movingBALL.getY()<=playerC.getY()+playerH ){
-			movingBALL.setX(playerC.getX()-movingBALL.getRadius());
-			playerS.setBallx(playerC.getX()-movingBALL.getRadius());
-			movingBALL.setXv(movingBALL.getXv()*-1);
-		}
-		
-	}
-	
+    private Image createImage() {
 
-	  /////////////////////
-	 // - KeyListener - //
-	/////////////////////
+        BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
+        gr = bufferedImage.createGraphics();
 
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-	
-		// TODO Auto-generated method stub
-		int keycode = arg0.getKeyCode();
-		if(keycode == KeyEvent.VK_UP){
-			playerUP();
-			repaint();
-		}
-		if(keycode == KeyEvent.VK_DOWN){
-			playerDOWN();
-			repaint();
-		}
-		if(Restart == true){
-			restartON = true;
-			playerS.setRestart(true);
-		}
-		
-		if(keycode == KeyEvent.VK_N || keycode == KeyEvent.VK_ESCAPE && Restart == true){
-			try {
-				this.setVisible(false);
-				serverSoc.close();
-				System.exit(EXIT_ON_CLOSE);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
+        //Tabla
+        gr.setColor(new Color(15, 9, 9));
+        gr.fillRect(0, 0, WIDTH, HEIGHT);
 
-	
-	@SuppressWarnings("deprecation")
-	@Override
-	public void windowClosing(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-	
-		Thread.currentThread().stop();
-		this.setVisible(false);
-		try {
-			serverSoc.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
-		System.exit(1);
-	}
+        //Lineas
+        gr.setColor(Color.white);
+        gr.fillRect(WIDTH / 2 - 5, 0, 5, HEIGHT);
+        gr.fillRect(WIDTH / 2 + 5, 0, 5, HEIGHT);
 
-	@Override
-	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+        //Puntaje
+        gr.setFont(sFont);
+        gr.setColor(new Color(228, 38, 36));
+        gr.drawString("" + playerServer.getScoreS(), WIDTH / 2 - 60, 120);
+        gr.drawString("" + playerServer.getScoreP(), WIDTH / 2 + 15, 120);
 
-	@Override
-	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+        //Nombre jugadores
+        gr.setFont(nFont);
+        gr.setColor(Color.white);
+        gr.drawString(playerServer.getName(), WIDTH / 10, HEIGHT - 20);
+        gr.drawString(playerClient.getName(), 600, HEIGHT - 20);
 
+        //Jugadores
+        gr.setColor(new Color(73, 235, 224));
+        gr.fillRect(playerServer.getX(), playerServer.getY(), playerBarWidth, playerBarHeight);
+        gr.setColor(new Color(57, 181, 74));
+        gr.fillRect(playerClient.getX(), playerClient.getY(), playerBarWidth, playerBarHeight);
 
+        //Ball
+        gr.setColor(new Color(255, 255, 255));
+        gr.fillOval(playerServer.getBallx(), playerServer.getBally(), 45, 45);
+        gr.setColor(ball.getColorBall());
+        gr.fillOval(playerServer.getBallx() + 5, playerServer.getBally() + 5, 45 - 10, 45 - 10);
 
-	@Override
-	public void windowActivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+        //Mensajes
+        message = playerServer.getImessage().split("-");
+        gr.setFont(mFont);
+        gr.setColor(Color.white);
+        if (message.length != 0) {
+            gr.drawString(message[0], WIDTH / 4 - 31, HEIGHT / 2 + 38);
+            if (message.length > 1) {
+                if (message[1].length() > 6) {
+                    gr.setFont(rFont);
+                    gr.setColor(new Color(228, 38, 36));
+                    gr.drawString(message[1], WIDTH / 4 - 31, HEIGHT / 2 + 100);
+                }
+            }
+        }
+        return bufferedImage;
+    }
 
+    @Override
+    public void paint(Graphics g) {
+        g.drawImage(createImage(), 0, 0, this);
+    }
 
+    public void updateBall() {
 
-	@Override
-	public void windowClosed(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		System.exit(1);
-	}
+        verificarColisiones();
 
+        playerServer.setBallx(ball.getX());
+        playerServer.setBally(ball.getY());
 
-	@Override
-	public void windowDeactivated(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
+    // Mover barra hacia arriba
+    public void playerUP() {
+        if (playerServer.getY() - playerVelocidad > playerBarHeight / 2 - 10) {
 
+            playerServer.setY(playerServer.getY() - playerVelocidad);
+        }
+    }
 
-	@Override
-	public void windowDeiconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+    // Mover barra hacia abajo
+    public void playerDOWN() {
+        if (playerServer.getY() + playerVelocidad < HEIGHT - playerBarHeight - 30) {
 
+            playerServer.setY(playerServer.getY() + playerVelocidad);
+        }
+    }
 
+    public void verificarColisiones() {
 
-	@Override
-	public void windowIconified(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+        if (playerServer.getBallx() < playerClient.getX() && playerServer.getBallx() > playerServer.getX()) {
+            verificar = true;
+        }
 
+        if (playerServer.getBallx() > playerClient.getX() && verificar) {
 
+            playerServer.setScoreS(playerServer.getScoreS() + 1);
 
-	@Override
-	public void windowOpened(WindowEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
- 
+            verificar = false;
+        } else if (playerServer.getBallx() <= playerServer.getX() && verificar) {
+
+            playerServer.setScoreP(playerServer.getScoreP() + 1);
+
+            verificar = false;
+
+        }
+
+        if (ball.getX() <= playerServer.getX() + playerBarWidth && ball.getY() + ball.getRadio() >= playerServer.getY() && ball.getY() <= playerServer.getY() + playerBarHeight) {
+            ball.setX(playerServer.getX() + playerBarWidth);
+            playerServer.setBallx(playerServer.getX() + playerBarWidth);
+            ball.setXv(ball.getXv() * -1);
+        }
+
+        if (ball.getX() + ball.getRadio() >= playerClient.getX() && ball.getY() + ball.getRadio() >= playerClient.getY() && ball.getY() <= playerClient.getY() + playerBarHeight) {
+            ball.setX(playerClient.getX() - ball.getRadio());
+            playerServer.setBallx(playerClient.getX() - ball.getRadio());
+            ball.setXv(ball.getXv() * -1);
+        }
+    }
+
+    @Override
+    public void keyPressed(KeyEvent arg0) {
+
+        int keycode = arg0.getKeyCode();
+        if (keycode == KeyEvent.VK_UP) {
+            playerUP();
+            repaint();
+        }
+        if (keycode == KeyEvent.VK_DOWN) {
+            playerDOWN();
+            repaint();
+        }
+        if (reiniciar == true) {
+            reiniciarON = true;
+            playerServer.setRestart(true);
+        }
+
+        if (keycode == KeyEvent.VK_N || keycode == KeyEvent.VK_ESCAPE && reiniciar == true) {
+            try {
+                this.setVisible(false);
+                serverSocket.close();
+                System.exit(EXIT_ON_CLOSE);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void windowClosing(WindowEvent arg0) {
+        Thread.currentThread().stop();
+        this.setVisible(false);
+        try {
+            serverSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.exit(1);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent arg0) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent arg0) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent arg0) {
+
+    }
+
+    @Override
+    public void windowClosed(WindowEvent arg0) {
+        System.exit(1);
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent arg0) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent arg0) {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent arg0) {
+
+    }
+
+    @Override
+    public void windowOpened(WindowEvent arg0) {
+
+    }
 }

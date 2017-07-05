@@ -3,80 +3,65 @@ import java.awt.Color;
 
 public class Ball extends Thread {
 
-    /**
-     * - Ball v1.0
-     */
-    ///////////////////
-    // - Variables - //
-    ///////////////////
-    private int x;			 // - represents the x coordinate of the ball
-    private int y;			 // - represents the y coordinate of the ball
-    private double xv;      	 // - x velocity 
-    private double yv;      	 // - y velocity
-    private int radius;		 // - radius of the ball
+    private int x;
+    private int y;
+    private double xv;  // velocidad en eje X 
+    private double yv;  // velocidad en eje Y
+    private int radio;
     private int HEIGHT;
     private int WIDTH;
-    private Color colorBall;
+    private Color color;
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
         while (true) {
-            move();
+            mover();
             try {
                 sleep(10);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
-        // - Set text color - //
+    }
 
-    }// *<-- end of the run --> //
-
-    public Ball(int x, int y, double xv, double yv, int radius, int WIDTH, int HEIGHT) {
+    public Ball(int x, int y, double xv, double yv, int radio, int WIDTH, int HEIGHT) {
         super();
         this.x = x;
         this.y = y;
         this.xv = xv;
         this.yv = yv;
-        this.radius = radius;
+        this.radio = radio;
         this.WIDTH = WIDTH;
         this.HEIGHT = HEIGHT;
-        this.colorBall=new Color(255,242,44);
+        this.color = new Color(255, 242, 44);
     }
 
-    public void move() {
-        if (x + xv > (WIDTH - radius) - 7) { // - Calibrate the screen layer - //
-            x = (WIDTH - radius) - 7; // - set the position of the ball
-            xv = xv * -1; // - set the velocity of the ball
+    public void mover() {
+        if (x + xv > (WIDTH - radio) - 7) {
+            x = (WIDTH - radio) - 7; // posición
+            xv = xv * -1;   // velocidad
 
         }
 
-        if (x + xv < 9) {  // - Calibrate the screen layer - //
+        if (x + xv < 9) {
             x = 9;
             xv = xv * -1;
         }
 
-        if (y + yv < radius / 2 + 7) { // - Calibrate the screen layer - //
+        if (y + yv < radio / 2 + 7) {
             y = 29;
             yv = yv * -1;
         }
 
-        if (y + yv > (HEIGHT - radius) - 6) // - Calibrate the screen layer - //
-        {
-            y = (HEIGHT - radius) - 6;
+        if (y + yv > (HEIGHT - radio) - 6) {
+            y = (HEIGHT - radio) - 6;
             yv = yv * -1;
 
         }
         x += xv;
         y += yv;
-
     }
 
-    ///////////////////////////
-    // - Getters & Setters - //
-    ///////////////////////////
     public int getX() {
         return x;
     }
@@ -109,20 +94,19 @@ public class Ball extends Thread {
         this.yv = yv;
     }
 
-    public int getRadius() {
-        return radius;
+    public int getRadio() {
+        return radio;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
+    public void setRadio(int radio) {
+        this.radio = radio;
     }
 
     public Color getColorBall() {
-        return colorBall;
+        return color;
     }
 
     public void setColorBall(Color colorBall) {
-        this.colorBall = colorBall;
+        this.color = colorBall;
     }
-
-}// *<--end of the Class -->* //
+}

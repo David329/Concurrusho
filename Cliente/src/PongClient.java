@@ -61,7 +61,7 @@ public class PongClient extends JFrame implements KeyListener, Runnable, WindowL
 		// - Players - //
 		playerS = new PlayerServer();
 		playerC = new PlayerClient(clientname);
-		playerS.setName(clientname);
+		playerS.setName("");
 			
 		// - Socket - //
 		this.ipAdd = ipAdd;
